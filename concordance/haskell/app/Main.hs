@@ -27,6 +27,9 @@ countWords wordList =
         updateWordMap wordMap word =
           M.insertWith (+) word 1 wordMap
 
+printWordSummary :: (Int, S.Set T.Text) -> IO ()
+printWordSummary (count, word) = printf "%7d %s\n" count (S.elemAt 0 word)
+
 main :: IO ()
 main = do
   input <- B.getContents
@@ -37,5 +40,5 @@ main = do
       wordCounts = countWords wordList
       wordCounts :: M.Map T.Text Int
       topWords = take 10 $ M.toDescList $ transMap wordCounts
-  print topWords
       topWords :: [(Int, S.Set T.Text)]
+  mapM_ printWordSummary topWords
