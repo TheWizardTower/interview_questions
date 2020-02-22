@@ -31,7 +31,11 @@ main :: IO ()
 main = do
   input <- B.getContents
   let text = TE.decodeUtf8 input
+      text :: T.Text
       wordList = T.words text
+      wordList :: [T.Text]
       wordCounts = countWords wordList
+      wordCounts :: M.Map T.Text Int
       topWords = take 10 $ M.toDescList $ transMap wordCounts
   print topWords
+      topWords :: [(Int, S.Set T.Text)]
