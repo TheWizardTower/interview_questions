@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/stat.h>
 
 void show_usage() { printf("TODO"); }
 
@@ -60,29 +61,25 @@ static error_t parse_opt(int key, char *arg, struct argp_state *state) {
 static struct argp argp = {options, parse_opt, args_doc, doc, 0, 0, 0};
 
 char *read_entire_file(char *filename) {
-  char *buffer = NULL;
-  int string_size;
-  int read_size;
+  printf("Reading from file %s\n", filename);
+  struct stat stats;
+  if (stat(filename, &stats)) {
+    printf("Could not stat file.\n");
+    exit(-1);
+  }
+  char *buffer = calloc(stats.st_size, sizeof(char));
   FILE *fp = fopen(filename, "r");
   if (!fp) {
     printf("Could not open file to read.");
     exit(-1);
   }
 
-  fseek(fp, 0, SEEK_END);
-  string_size = ftell(fp);
-  rewind(fp);
-
   /* printf("Malloc point one.\n"); */
-  buffer = (char *)malloc(sizeof(char) * (string_size + 1));
-  read_size = fread(buffer, sizeof(char), string_size, fp);
-  buffer[string_size] = '\0';
-
-  if (string_size != read_size) {
-    free(buffer);
-    buffer = NULL;
+  int read_size = fread(buffer, sizeof(char), stats.st_size, fp);
+  if (read_size == 0) {
+    printf("Could not read from file.\n");
+    exit(-1);
   }
-
   fclose(fp);
 
   return buffer;
