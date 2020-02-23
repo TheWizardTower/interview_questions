@@ -246,7 +246,7 @@ int main(int argc, char **argv) {
   struct command_line_options cl_options;
   cl_options.word_count = 10;
   cl_options.filename = "";
-  argp_parse(&argp, argc, argv, 0, 0, &options);
+  argp_parse(&argp, argc, argv, 0, 0, &cl_options);
 
   char *contents = get_input(cl_options.filename);
 
