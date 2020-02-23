@@ -21,8 +21,8 @@ data CommandArguments = CommandArguments
   , numWords :: Int
   }
 
-cli_parser :: Parser CommandArguments
-cli_parser = CommandArguments
+cliParser :: Parser CommandArguments
+cliParser = CommandArguments
   <$> A.strOption
    ( long "filename"
   <> short 'f'
@@ -41,8 +41,8 @@ cli_parser = CommandArguments
 
 readFromFileOrStdin :: T.Text -> IO B.ByteString
 readFromFileOrStdin fname =
-  if (T.null fname) then B.getContents
-  else withFile (T.unpack fname) ReadMode (B.hGetContents)
+  if T.null fname then B.getContents
+  else withFile (T.unpack fname) ReadMode B.hGetContents
 
 
 -- Thanks Yorgey
@@ -52,22 +52,19 @@ transMap = M.fromListWith S.union . map (second S.singleton . swap) . M.toList
 
 
 countWords :: [T.Text] -> M.Map T.Text Int
-countWords wordList =
-  L.foldl' f M.empty wordList
-  where f wordMap word =
-          updateWordMap wordMap word
-        updateWordMap wordMap word =
+countWords = L.foldl' updateWordMap M.empty
+  where  updateWordMap wordMap word =
           M.insertWith (+) word 1 wordMap
 
 takeUpTo :: Int -> [a] ->  [a]
-takeUpTo count list = if (length list) >= count then list else take count list
+takeUpTo count list = if length list >= count then list else take count list
 
 printWordSummary :: (Int, S.Set T.Text) -> IO ()
 printWordSummary (count, word) = printf "%7d %s\n" count (S.elemAt 0 word)
 
 main :: IO ()
 main = do
-  let opts = info (cli_parser <**> helper)
+  let opts = info (cliParser <**> helper)
         ( fullDesc
         <> progDesc "Build a concordance from an input file, and show the N most frequent words."
         <> header "Concordance-Haskell -- a concordance builder for input files built in Haskell."
