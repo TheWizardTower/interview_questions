@@ -34,9 +34,9 @@ static char doc[] =
     "this, it prints the n most common words in the input.";
 static char args_doc[] = "concord_c";
 static struct argp_option options[] = {
-    {"number", 'n', "num", 0, "Number of words to show."},
+    {"number", 'n', "num", 0, "Number of words to show.", 0},
     {"filename", 'f', "file", 0,
-     "File to read from. If not provided, read from stdin."},
+     "File to read from. If not provided, read from stdin.", 0},
 };
 
 static error_t parse_opt(int key, char *arg, struct argp_state *state) {
@@ -51,7 +51,7 @@ static error_t parse_opt(int key, char *arg, struct argp_state *state) {
   return 0;
 }
 
-static struct argp argp = { options, parse_opt, args_doc, doc } ;
+static struct argp argp = {options, parse_opt, args_doc, doc, 0, 0, 0};
 
 char *read_entire_file(char *filename) {
   char *buffer = NULL;
