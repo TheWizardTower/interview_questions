@@ -1,3 +1,7 @@
+extern crate argparse;
+
+use argparse::{ArgumentParser, Store};
+use std::fs::File;
 use std::collections::BTreeMap;
 use std::collections::HashSet;
 use std::io::{self, Read};
@@ -37,11 +41,35 @@ fn count_words(words: &str) -> BTreeMap<String, u32> {
 }
 
 fn main() -> io::Result<()> {
+    let mut filename = "".to_string();
+    let mut num_words = 10;
+
+    {
+        let mut ap = ArgumentParser::new();
+        ap.set_description("Build a concordance from input. Built using Rust.");
+        ap.refer(&mut filename)
+            .add_option(&["-f", "--filename"], Store,
+                        "Filename to read in. If none is given, will default to reading stdin.");
+        ap.refer(&mut num_words)
+            .add_option(&["-n", "--numWords"], Store,
+                        "Number of unique words to print. Defaults to 10.");
+        ap.parse_args_or_exit();
+    }
     let mut buffer = String::new();
-    io::stdin().read_to_string(&mut buffer)?;
+    if filename == "" {
+        io::stdin().read_to_string(&mut buffer)?;
+    } else {
+        let mut file = File::open(filename).expect("No such file.");
+        file.read_to_string(&mut buffer)?;
+    }
     let word_count = count_words(&buffer);
     let inverted = invert_map(word_count);
-    let top_ten: Vec<_> = inverted.iter().rev().take(10).collect();
-    println!("{:?}", top_ten);
+    let top_ten: Vec<_> = inverted.iter().rev().take(num_words).collect();
+    for x in top_ten.iter() {
+        for y in x.1.iter() {
+            println!("{:7} {}", x.0, y);
+            break;
+        }
+    }
     Ok(())
 }
