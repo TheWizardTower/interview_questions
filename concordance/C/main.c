@@ -85,17 +85,36 @@ char *read_entire_file(char *filename) {
   return buffer;
 }
 
-char* read_from_stdin() {
-  char *text = calloc(1, 1), buffer[10];
-  while (fgets(buffer, 10, stdin)) {
-    text = realloc(text, strnlen(text, INT64_MAX)+1+strnlen(buffer, INT64_MAX));
-    if (!text) {
-      printf("Out of memory.\n");
-      exit(-1);
+#define STEP_SIZE 10240
+char *read_from_stdin() {
+  char *storage = calloc(STEP_SIZE, sizeof(char));
+  char *buffer = calloc(STEP_SIZE, sizeof(char));
+  int byteCount = 0;
+  int storage_size = STEP_SIZE;
+  while (fgets(buffer, STEP_SIZE, stdin) != NULL) {
+    // read up to BUFFER_SIZE into buffer
+    // store # of bytes read as temp1
+    int temp1 = strnlen(buffer, INT64_MAX);
+    byteCount += temp1;
+    if (byteCount > storage_size) {
+      int old_size = storage_size;
+      storage_size *= 2;
+      storage = realloc(storage, storage_size);
+      if (!storage) {
+        printf("Out of memory.\n");
+        exit(-1);
+      }
+      // wipe end of storage with nulls
+      for (int i = old_size; i < storage_size; i++) {
+        storage[i] = '\0';
+      }
     }
-    strncat(text, buffer, INT64_MAX);
+    // copy buffer into end of storage
+    strncat(storage, buffer, INT64_MAX);
+    // wipe buffer
+    memset(buffer, 0, 1024);
   }
-  return text;
+  return storage;
 }
 
 char *get_input(char *filename) {
