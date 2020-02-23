@@ -40,10 +40,10 @@ static struct argp_option options[] = {
 };
 
 static error_t parse_opt(int key, char *arg, struct argp_state *state) {
-  struct command_line_options *cl_options = state->input;
+  struct command_line_options *cl_opt = state->input;
   switch(key) {
-  case 'f': cl_options->filename = arg; break;
-  case 'n': cl_options->word_count = atoi(arg); break;
+  case 'f': cl_opt->filename = arg; break;
+  case 'n': cl_opt->word_count = atoi(arg); break;
   case ARGP_KEY_END: break;
   default: return ARGP_ERR_UNKNOWN;
   }
