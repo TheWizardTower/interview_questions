@@ -12,7 +12,7 @@ import qualified Data.Set            as S
 import qualified Data.Text           as T
 import qualified Data.Text.Encoding  as TE
 import           Options.Applicative as A
-import           Prelude             (IO, Int, Ord, map, length, take, ($), (>=), (+), (.))
+import           Prelude             (IO, Int, Ord, map, take, ($), (+), (.))
 import           System.IO           (IOMode (..), withFile)
 import           Text.Printf         (printf)
 
@@ -55,9 +55,6 @@ countWords :: [T.Text] -> M.Map T.Text Int
 countWords = L.foldl' updateWordMap M.empty
   where  updateWordMap wordMap word =
           M.insertWith (+) word 1 wordMap
-
-takeUpTo :: Int -> [a] ->  [a]
-takeUpTo count list = if length list >= count then list else take count list
 
 printWordSummary :: (Int, S.Set T.Text) -> IO ()
 printWordSummary (count, word) = printf "%7d %s\n" count (S.elemAt 0 word)
