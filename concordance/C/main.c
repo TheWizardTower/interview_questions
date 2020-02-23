@@ -14,17 +14,17 @@ struct command_line_options {
 
 struct word_list {
   int length;
-  char** word_list;
+  char **word_list;
 };
 
 struct word_count {
   int count;
-  char* word;
+  char *word;
 };
 
 struct concordance {
   int length;
-  struct word_count* wc;
+  struct word_count *wc;
 };
 
 const char *argp_program_version = "concordance_c 0.0.1";
@@ -95,11 +95,12 @@ char* read_from_stdin() {
   return text;
 }
 
-char* get_input(char* filename) {
-  return strncmp(filename, "", INT64_MAX) ? read_entire_file(filename) : read_from_stdin();
+char *get_input(char *filename) {
+  return strncmp(filename, "", INT64_MAX) ? read_entire_file(filename)
+                                          : read_from_stdin();
 }
 
-void replace_whitespace(char* input) {
+void replace_whitespace(char *input) {
   int length = strnlen(input, INT64_MAX);
   for (int i = 0; i < length; i++) {
     if (isspace(input[i])) {
@@ -108,8 +109,8 @@ void replace_whitespace(char* input) {
   }
 }
 
-struct word_list split(char* input) {
-  char* token = NULL;
+struct word_list split(char *input) {
+  char *token = NULL;
   int count = 0;
   int length = strnlen(input, INT64_MAX);
   for (int i = 0; i < length; i++) {
@@ -119,7 +120,7 @@ struct word_list split(char* input) {
   }
 
   /* printf("Malloc point two.\n"); */
-  char** word_list = calloc(count, sizeof(struct word_list));
+  char **word_list = calloc(count, sizeof(struct word_list));
   /* printf("Malloc point two done.\n"); */
   count = 0;
   while ((token = strsep(&input, "\n"))) {
@@ -139,8 +140,8 @@ struct word_list split(char* input) {
 }
 
 int cmpfnc(const void *a, const void *b) {
-  const char **ia = (const char**)a;
-  const char **ib = (const char**)b;
+  const char **ia = (const char **)a;
+  const char **ib = (const char **)b;
 
   int a_length = strnlen(*ia, INT64_MAX);
   int b_length = strnlen(*ib, INT64_MAX);
@@ -148,17 +149,18 @@ int cmpfnc(const void *a, const void *b) {
 }
 
 int wc_cmp_fnc(const void *a, const void *b) {
-  const struct word_count* wc_a = (struct word_count*)a;
-  const struct word_count* wc_b = (struct word_count*)b;
+  const struct word_count *wc_a = (struct word_count *)a;
+  const struct word_count *wc_b = (struct word_count *)b;
 
   return wc_a->count - wc_b->count;
 }
 
 struct concordance count_duplicates(struct word_list wl) {
-  struct word_count* wc;
-  /* printf("sizeof word_count: %lu\nlength: %d\n", (unsigned long)sizeof(struct word_count), wl.length); */
+  struct word_count *wc;
+  /* printf("sizeof word_count: %lu\nlength: %d\n", (unsigned long)sizeof(struct
+   * word_count), wl.length); */
   /* printf("Malloc point three.\n"); */
-  wc = (struct word_count*)calloc(wl.length, sizeof(struct word_count));
+  wc = (struct word_count *)calloc(wl.length, sizeof(struct word_count));
   /* printf("Past malloc() call.\n"); */
   struct word_count wc_tmp;
   wc_tmp.word = "";
@@ -218,7 +220,7 @@ void build_wordlist(struct concordance *concord, int number_argument) {
     int wc_index = i + concord->length - number_argument;
     struct word_count wc_tmp;
     int string_length = strnlen(concord->wc[wc_index].word, INT64_MAX);
-    wc_tmp.word = calloc(string_length + 1, sizeof(char*));
+    wc_tmp.word = calloc(string_length + 1, sizeof(char *));
     strncpy(wc_tmp.word, concord->wc[wc_index].word, string_length + 1);
     wc_tmp.count = concord->wc[wc_index].count;
     wc[i] = wc_tmp;
@@ -267,7 +269,7 @@ int main(int argc, char **argv) {
 
   /* printf("Sorting function starting.\n"); */
 
-  qsort(wl.word_list, wl.length, sizeof(char*), cmpfnc);
+  qsort(wl.word_list, wl.length, sizeof(char *), cmpfnc);
   /* printf("Sorting function done.\n"); */
 
   /* for (int i = 0; i < wl.length; i++) { */
