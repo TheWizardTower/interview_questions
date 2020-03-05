@@ -111,11 +111,11 @@ public:
   // the least recently-used value to evict.
   InsertResult insertKey(string key, string value) {
     if (size > currentLength) {
-      this->currentLength++;
+      currentLength++;
       struct LruValue tmp;
       tmp.value = value;
       tmp.lastAccessTime = time(0);
-      this->cache[key] = tmp;
+      cache[key] = tmp;
       return InsertResult::Success;
     }
 
