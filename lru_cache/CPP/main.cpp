@@ -238,5 +238,11 @@ int main() {
                   "Verifying C++:Rocks got LRU-Evicted.");
   validate_result(my_cache->getKey("Key"), empty,
                   "Verifying Key:Value got LRU-Evicted.");
+
+  validate_result(my_cache->deleteKey("Adam"), DeleteResult::KeyNotFound,
+                  "Verifying deleting a non-existent key behaves properly.");
+  validate_result(my_cache->deleteKey("Key0"), DeleteResult::Success,
+                  "Verifying deleting an existent key behaves properly.");
+
   return 0;
 }
