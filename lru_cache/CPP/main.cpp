@@ -82,6 +82,9 @@ string showDeleteResult(const DeleteResult &dr) {
   case DeleteResult::KeyNotFound:
     return "KeyNotFound";
   }
+
+  // Again, find a way to compile this function without a throw or a semaphore
+  // value.
   throw;
 }
 
