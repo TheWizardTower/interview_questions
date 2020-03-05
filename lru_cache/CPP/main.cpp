@@ -27,6 +27,7 @@ enum class InsertResult {
   Failure,
 };
 
+// deriving a 'show' instance for InsertResult.
 string showInsertResult(const InsertResult &ir) {
   switch (ir) {
   case InsertResult::Success:
@@ -44,37 +45,72 @@ string showInsertResult(const InsertResult &ir) {
   throw;
 }
 
+// Operator definition for InsertResult, referencing the above case/switch
+// function.
 ostream &operator<<(ostream &os, const InsertResult &ir) {
   os << showInsertResult(ir);
   return os;
 }
 
+// Same for std::optional<string>. When values are in this type, they are their
+// base type, so the expected solution of checking if the optional has a value
+// does not work. We need to handle that case with a separate dispatch, defined
+// immediately below this.
 ostream &operator<<(ostream &os, const optional<string> &o) {
   os << o;
   return os;
 }
 
+// Handle the 'empty' case of std::optional.
 ostream &operator<<(ostream &os, const nullopt_t) {
   os << "Nothing";
   return os;
 }
+
+// Specific enumeration of the possible results of the deleteKey operation in
+// the LRU cache.
 enum class DeleteResult {
   Success,
   KeyNotFound,
 };
 
+// Again, a show instance for the DeleteResult type.
+string showDeleteResult(const DeleteResult &dr) {
+  switch (dr) {
+  case DeleteResult::Success:
+    return "Success";
+  case DeleteResult::KeyNotFound:
+    return "KeyNotFound";
+  }
+  throw;
+}
+
+// Operator definition for DeleteResult, referencing the above case/switch
+// function.
+ostream &operator<<(ostream &os, const DeleteResult &ir) {
+  os << showDeleteResult(ir);
+  return os;
+}
+
+// Least-Recently Used Evicting Cache class. We're reasoning about 'size' in
+// terms of number of values, rather than actual size of bytes in memory.
 class LruCache {
 public:
   // Constructor. Takes the size of the 'cache' as an integer.
-  LruCache(int size) {
-    this->size = size;
-    this->currentLength = 0;
-    this->cache = {};
+  LruCache(unsigned int inputSize) {
+    if (inputSize == 0) {
+      throw;
+    }
+    size = inputSize;
+    currentLength = 0;
+    cache = {};
   }
 
-  // Tries to insert a value. Returns what had to happen to do the insert.
+  // Tries to insert a value. Returns what had to happen to do the insert. This
+  // can be O(n) in the worst case, because of the search through the list for
+  // the least recently-used value to evict.
   InsertResult insertKey(string key, string value) {
-    if (this->size > this->currentLength) {
+    if (size > currentLength) {
       this->currentLength++;
       struct LruValue tmp;
       tmp.value = value;
@@ -83,8 +119,10 @@ public:
       return InsertResult::Success;
     }
 
+    // If we're here, we're at capacity, so get the value to evict.
     optional<string> overwrite_key = getLeastRecentlyUsedKey();
     if (!overwrite_key.has_value()) {
+      // Something deeply bizarre has happened.
       return InsertResult::Failure;
     }
     cache.erase(overwrite_key.value());
@@ -96,6 +134,8 @@ public:
     return InsertResult::Success_Overwrote;
   }
 
+  // Returns the value associated with the provided key, after updating the
+  // usage time. O(1) time.
   optional<string> getKey(string key) {
     if (cache.find(key) == cache.end()) {
       return {};
@@ -105,6 +145,8 @@ public:
     return cache[key].value;
   }
 
+  // Deletes a key from the cache, if the key is found. If it is not, return a
+  // failure value. If it is, reduce the size counter and return success. O(1).
   DeleteResult deleteKey(string key) {
     if (cache.find(key) == cache.end()) {
       return DeleteResult::KeyNotFound;
@@ -116,6 +158,8 @@ public:
   }
 
 private:
+  // Search through the cache, find the value that was least-recently accessed.
+  // O(n).
   std::optional<string> getLeastRecentlyUsedKey() {
     optional<string> result = {};
     time_t min = numeric_limits<time_t>::max();
@@ -130,12 +174,15 @@ private:
     return result;
   }
 
+  // Prvate struct variable, describing the value being stored in the LRU, and
+  // the time it was last accessed.
   struct LruValue {
     string value;
     time_t lastAccessTime;
   };
   int size;
   int currentLength;
+  // The actual data cache.
   map<string, struct LruValue> cache;
 };
 
