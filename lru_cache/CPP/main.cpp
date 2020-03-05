@@ -54,6 +54,10 @@ ostream &operator<<(ostream &os, const optional<string> &o) {
   return os;
 }
 
+ostream &operator<<(ostream &os, const nullopt_t) {
+  os << "Nothing";
+  return os;
+}
 enum class DeleteResult {
   Success,
   KeyNotFound,
