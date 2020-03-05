@@ -24,6 +24,7 @@ using std::to_string;
 enum class InsertResult {
   Success,
   Success_Overwrote,
+  Success_Evicted,
   Failure,
 };
 
@@ -34,6 +35,8 @@ string showInsertResult(const InsertResult &ir) {
     return "Success";
   case InsertResult::Success_Overwrote:
     return "Success_Overwrote";
+  case InsertResult::Success_Evicted:
+    return "Success_Evicted";
   case InsertResult::Failure:
     return "Failure";
   }
@@ -113,6 +116,15 @@ public:
   // can be O(n) in the worst case, because of the search through the list for
   // the least recently-used value to evict.
   InsertResult insertKey(string key, string value) {
+    if (cache.find(key) != cache.end()) {
+      struct LruValue tmp;
+      tmp.value = value;
+      tmp.lastAccessTime = time(0);
+      cache[key] = tmp;
+
+      return InsertResult::Success_Overwrote;
+    }
+
     if (size > currentLength) {
       currentLength++;
       struct LruValue tmp;
@@ -215,11 +227,21 @@ int main() {
   unsigned int testFailureCount = 0;
 
   testFailureCount +=
-      validate_result(my_cache.insertKey("Adam", "McCullough"),
+      validate_result(my_cache.insertKey("Adam", "MCCULLOUGH"),
                       InsertResult::Success, "Inserting Adam:McCullough");
+
+  testFailureCount += validate_result(my_cache.getKey("Adam"),
+                                      make_optional((string) "MCCULLOUGH"),
+                                      "Verifying value behind 'Adam' key.");
+
+  testFailureCount += validate_result(my_cache.insertKey("Adam", "McCullough"),
+                                      InsertResult::Success_Overwrote,
+                                      "Re-Inserting Adam:McCullough");
+
   testFailureCount += validate_result(my_cache.getKey("Adam"),
                                       make_optional((string) "McCullough"),
-                                      "Getting Key 'Adam'");
+                                      "Verifying value behind 'Adam' key.");
+
   testFailureCount +=
       validate_result(my_cache.insertKey("C++", "Rocks"), InsertResult::Success,
                       "Inserting C++:Rocks");
