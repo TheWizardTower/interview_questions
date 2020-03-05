@@ -138,7 +138,7 @@ public:
   // usage time. O(1) time.
   optional<string> getKey(string key) {
     if (cache.find(key) == cache.end()) {
-      return {};
+      return nullopt;
     }
 
     cache[key].lastAccessTime = time(0);
