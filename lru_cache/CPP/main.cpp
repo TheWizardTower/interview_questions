@@ -157,6 +157,12 @@ public:
     return DeleteResult::Success;
   }
 
+  // Return the current number of values in the LRU Cache.
+  unsigned int getCapacity() { return currentLength; }
+
+  // Return the total capacity of the LRU Cache.
+  unsigned int getSize() { return size; }
+
 private:
   // Search through the cache, find the value that was least-recently accessed.
   // O(n).
@@ -180,8 +186,11 @@ private:
     string value;
     time_t lastAccessTime;
   };
-  int size;
-  int currentLength;
+
+  // unsigned to disallow negative values.
+  unsigned int size;
+  unsigned int currentLength;
+
   // The actual data cache.
   map<string, struct LruValue> cache;
 };
