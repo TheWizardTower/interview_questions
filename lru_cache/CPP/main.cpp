@@ -11,6 +11,8 @@ using std::cout;
 using std::endl;
 using std::make_optional;
 using std::map;
+using std::nullopt;
+using std::nullopt_t;
 using std::numeric_limits;
 using std::optional;
 using std::ostream;
@@ -173,5 +175,12 @@ int main() {
                     message);
   }
 
+  optional<string> empty = nullopt;
+  validate_result(my_cache->getKey("Adam"), empty,
+                  "Verifying Adam:McCullough got LRU-Evicted.");
+  validate_result(my_cache->getKey("C++"), empty,
+                  "Verifying C++:Rocks got LRU-Evicted.");
+  validate_result(my_cache->getKey("Key"), empty,
+                  "Verifying Key:Value got LRU-Evicted.");
   return 0;
 }
