@@ -227,8 +227,8 @@ int main() {
     string value = "Value" + to_string(i);
     string message = "Verifying that key  " + key + " Returns value " + value +
                      "After cache is filled.";
-    validate_result(my_cache->insertKey(key, value), InsertResult::Success_Overwrote,
-                    message);
+    validate_result(my_cache->insertKey(key, value),
+                    InsertResult::Success_Overwrote, message);
   }
 
   optional<string> empty = nullopt;
