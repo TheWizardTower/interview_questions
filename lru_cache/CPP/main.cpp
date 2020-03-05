@@ -36,7 +36,12 @@ string showInsertResult(const InsertResult &ir) {
   case InsertResult::Failure:
     return "Failure";
   }
-  return "RUN-TIME ERROR";
+
+  // I need to find a way to write this function without having a 'default'
+  // case, while still having all the -W* options turned on. The point of sum
+  // types is that something alerts if the pattern match is not exhaustive,
+  // which at the moment, the above is.
+  throw;
 }
 
 ostream &operator<<(ostream &os, const InsertResult &ir) {
