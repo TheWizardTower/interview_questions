@@ -196,63 +196,79 @@ private:
 };
 
 template <typename T>
-void validate_result(T result, T expected, string err_message) {
+unsigned int validate_result(T result, T expected, string err_message) {
   if (result == expected) {
-    return;
+    return 0;
   }
   cerr << "Result not expected!" << err_message << endl;
   cerr << "Expected: " << expected << endl;
   cerr << "Result:" << result << endl;
+  return 1;
 }
 
 int main() {
   auto my_cache = LruCache(10);
 
-  validate_result(my_cache.insertKey("Adam", "McCullough"),
-                  InsertResult::Success, "Inserting Adam:McCullough");
-  validate_result(my_cache.getKey("Adam"), make_optional((string) "McCullough"),
-                  "Getting Key 'Adam'");
-  validate_result(my_cache.insertKey("C++", "Rocks"), InsertResult::Success,
-                  "Inserting C++:Rocks");
-  validate_result(my_cache.insertKey("Key", "Value"), InsertResult::Success,
-                  "Inserting Key:Value");
+  unsigned int testFailureCount = 0;
+
+  testFailureCount +=
+      validate_result(my_cache.insertKey("Adam", "McCullough"),
+                      InsertResult::Success, "Inserting Adam:McCullough");
+  testFailureCount += validate_result(my_cache.getKey("Adam"),
+                                      make_optional((string) "McCullough"),
+                                      "Getting Key 'Adam'");
+  testFailureCount +=
+      validate_result(my_cache.insertKey("C++", "Rocks"), InsertResult::Success,
+                      "Inserting C++:Rocks");
+  testFailureCount +=
+      validate_result(my_cache.insertKey("Key", "Value"), InsertResult::Success,
+                      "Inserting Key:Value");
 
   for (auto i = 0; i < 7; i++) {
     string key = "Key" + to_string(i);
     string value = "Value" + to_string(i);
     string message = "Inserting  " + key + ":" + value;
-    validate_result(my_cache.insertKey(key, value), InsertResult::Success,
-                    message);
+    testFailureCount += validate_result(my_cache.insertKey(key, value),
+                                        InsertResult::Success, message);
   }
 
-  validate_result(my_cache.getKey("Adam"), make_optional((string) "McCullough"),
-                  "Getting key 'Adam' after cache is full.");
-  validate_result(my_cache.getKey("C++"), make_optional((string) "Rocks"),
-                  "Getting key 'C++' after cache is full.");
-  validate_result(my_cache.getKey("Key"), make_optional((string) "Value"),
-                  "Getting key 'Key' after cache is full.");
+  testFailureCount += validate_result(
+      my_cache.getKey("Adam"), make_optional((string) "McCullough"),
+      "Getting key 'Adam' after cache is full.");
+  testFailureCount +=
+      validate_result(my_cache.getKey("C++"), make_optional((string) "Rocks"),
+                      "Getting key 'C++' after cache is full.");
+  testFailureCount +=
+      validate_result(my_cache.getKey("Key"), make_optional((string) "Value"),
+                      "Getting key 'Key' after cache is full.");
 
   for (auto i = 7; i < 10; i++) {
     string key = "Key" + to_string(i);
     string value = "Value" + to_string(i);
     string message = "Verifying that key  " + key + " Returns value " + value +
                      "After cache is filled.";
-    validate_result(my_cache.insertKey(key, value),
-                    InsertResult::Success_Overwrote, message);
+    testFailureCount +=
+        validate_result(my_cache.insertKey(key, value),
+                        InsertResult::Success_Overwrote, message);
   }
 
   optional<string> empty = nullopt;
-  validate_result(my_cache.getKey("Adam"), empty,
-                  "Verifying Adam:McCullough got LRU-Evicted.");
-  validate_result(my_cache.getKey("C++"), empty,
-                  "Verifying C++:Rocks got LRU-Evicted.");
-  validate_result(my_cache.getKey("Key"), empty,
-                  "Verifying Key:Value got LRU-Evicted.");
+  testFailureCount +=
+      validate_result(my_cache.getKey("Adam"), empty,
+                      "Verifying Adam:McCullough got LRU-Evicted.");
+  testFailureCount += validate_result(my_cache.getKey("C++"), empty,
+                                      "Verifying C++:Rocks got LRU-Evicted.");
+  testFailureCount += validate_result(my_cache.getKey("Key"), empty,
+                                      "Verifying Key:Value got LRU-Evicted.");
 
-  validate_result(my_cache.deleteKey("Adam"), DeleteResult::KeyNotFound,
-                  "Verifying deleting a non-existent key behaves properly.");
-  validate_result(my_cache.deleteKey("Key0"), DeleteResult::Success,
-                  "Verifying deleting an existent key behaves properly.");
+  testFailureCount += validate_result(
+      my_cache.deleteKey("Adam"), DeleteResult::KeyNotFound,
+      "Verifying deleting a non-existent key behaves properly.");
+  testFailureCount +=
+      validate_result(my_cache.deleteKey("Key0"), DeleteResult::Success,
+                      "Verifying deleting an existent key behaves properly.");
+
+  cout << "Test failures: " << testFailureCount << endl;
 
   return 0;
 }
