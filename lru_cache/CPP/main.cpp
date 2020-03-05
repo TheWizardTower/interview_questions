@@ -207,6 +207,7 @@ int main() {
                   "Inserting C++:Rocks");
   validate_result(my_cache->insertKey("Key", "Value"), InsertResult::Success,
                   "Inserting Key:Value");
+
   for (auto i = 0; i < 7; i++) {
     string key = "Key" + to_string(i);
     string value = "Value" + to_string(i);
@@ -214,6 +215,7 @@ int main() {
     validate_result(my_cache->insertKey(key, value), InsertResult::Success,
                     message);
   }
+
   validate_result(my_cache->getKey("Adam"),
                   make_optional((string) "McCullough"),
                   "Getting key 'Adam' after cache is full.");
