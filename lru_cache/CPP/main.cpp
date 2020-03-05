@@ -206,31 +206,30 @@ void validate_result(T result, T expected, string err_message) {
 }
 
 int main() {
-  auto my_cache = new LruCache(10);
+  auto my_cache = LruCache(10);
 
-  validate_result(my_cache->insertKey("Adam", "McCullough"),
+  validate_result(my_cache.insertKey("Adam", "McCullough"),
                   InsertResult::Success, "Inserting Adam:McCullough");
-  validate_result(my_cache->getKey("Adam"),
-                  make_optional((string) "McCullough"), "Getting Key 'Adam'");
-  validate_result(my_cache->insertKey("C++", "Rocks"), InsertResult::Success,
+  validate_result(my_cache.getKey("Adam"), make_optional((string) "McCullough"),
+                  "Getting Key 'Adam'");
+  validate_result(my_cache.insertKey("C++", "Rocks"), InsertResult::Success,
                   "Inserting C++:Rocks");
-  validate_result(my_cache->insertKey("Key", "Value"), InsertResult::Success,
+  validate_result(my_cache.insertKey("Key", "Value"), InsertResult::Success,
                   "Inserting Key:Value");
 
   for (auto i = 0; i < 7; i++) {
     string key = "Key" + to_string(i);
     string value = "Value" + to_string(i);
     string message = "Inserting  " + key + ":" + value;
-    validate_result(my_cache->insertKey(key, value), InsertResult::Success,
+    validate_result(my_cache.insertKey(key, value), InsertResult::Success,
                     message);
   }
 
-  validate_result(my_cache->getKey("Adam"),
-                  make_optional((string) "McCullough"),
+  validate_result(my_cache.getKey("Adam"), make_optional((string) "McCullough"),
                   "Getting key 'Adam' after cache is full.");
-  validate_result(my_cache->getKey("C++"), make_optional((string) "Rocks"),
+  validate_result(my_cache.getKey("C++"), make_optional((string) "Rocks"),
                   "Getting key 'C++' after cache is full.");
-  validate_result(my_cache->getKey("Key"), make_optional((string) "Value"),
+  validate_result(my_cache.getKey("Key"), make_optional((string) "Value"),
                   "Getting key 'Key' after cache is full.");
 
   for (auto i = 7; i < 10; i++) {
@@ -238,21 +237,21 @@ int main() {
     string value = "Value" + to_string(i);
     string message = "Verifying that key  " + key + " Returns value " + value +
                      "After cache is filled.";
-    validate_result(my_cache->insertKey(key, value),
+    validate_result(my_cache.insertKey(key, value),
                     InsertResult::Success_Overwrote, message);
   }
 
   optional<string> empty = nullopt;
-  validate_result(my_cache->getKey("Adam"), empty,
+  validate_result(my_cache.getKey("Adam"), empty,
                   "Verifying Adam:McCullough got LRU-Evicted.");
-  validate_result(my_cache->getKey("C++"), empty,
+  validate_result(my_cache.getKey("C++"), empty,
                   "Verifying C++:Rocks got LRU-Evicted.");
-  validate_result(my_cache->getKey("Key"), empty,
+  validate_result(my_cache.getKey("Key"), empty,
                   "Verifying Key:Value got LRU-Evicted.");
 
-  validate_result(my_cache->deleteKey("Adam"), DeleteResult::KeyNotFound,
+  validate_result(my_cache.deleteKey("Adam"), DeleteResult::KeyNotFound,
                   "Verifying deleting a non-existent key behaves properly.");
-  validate_result(my_cache->deleteKey("Key0"), DeleteResult::Success,
+  validate_result(my_cache.deleteKey("Key0"), DeleteResult::Success,
                   "Verifying deleting an existent key behaves properly.");
 
   return 0;
