@@ -3,11 +3,11 @@
 
 module Lib  (LRUValue, LRUCache, insertIntoCache, getFromCache, makeSizedLRU) where
 
-import           Control.Lens    (makeLenses, view, (%~), (&), (+~), (.~))
-import qualified Data.Map        as M (Map, delete, foldlWithKey, fromList,
-                                       insert, lookup)
-import           Prelude         (Int, Maybe (..), Ord (..), Ordering (..),
-                                  return, ($), (+))
+import           Control.Lens (makeLenses, view, (%~), (&), (+~), (.~))
+import qualified Data.Map     as M (Map, delete, foldlWithKey, fromList, insert,
+                                    lookup)
+import           Prelude      (Int, Maybe (..), Ord (..), Ordering (..), return,
+                               ($), (+))
 
 data LRUValue v = LRUValue
     { _accessTime :: Int
