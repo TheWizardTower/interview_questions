@@ -1,11 +1,11 @@
 {-# LANGUAGE NoImplicitPrelude #-}
 {-# LANGUAGE TemplateHaskell   #-}
 
-module Lib  (LRUValue, LRUCache, insertIntoCache, getFromCache) where
+module Lib  (LRUValue, LRUCache, insertIntoCache, getFromCache, makeSizedLRU) where
 
 import           Control.Lens    (makeLenses, view, (%~), (&), (+~), (.~))
-import qualified Data.Map        as M (Map, delete, foldlWithKey, insert,
-                                       lookup)
+import qualified Data.Map        as M (Map, delete, foldlWithKey, fromList,
+                                       insert, lookup)
 import           Data.Time.Clock (UTCTime (..))
 import           Prelude         (Int, Maybe (..), Ord (..), Ordering (..),
                                   return, ($))
@@ -23,6 +23,15 @@ data LRUCache k v = LRUCache
 
 makeLenses ''LRUValue
 makeLenses ''LRUCache
+
+emptyLRU :: (Ord k) => LRUCache k v
+emptyLRU = LRUCache { _capacity = 0
+                    , _currentLength = 0
+                    , _cache = M.fromList []
+                    }
+
+makeSizedLRU :: (Ord k) => Int -> LRUCache k v
+makeSizedLRU size = emptyLRU & capacity .~ size
 
 mapWithKeyFunc :: Maybe (k, LRUValue v) -> k -> LRUValue v -> Maybe (k, LRUValue v)
 mapWithKeyFunc pair kr vr =
