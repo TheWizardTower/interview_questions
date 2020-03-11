@@ -3,7 +3,7 @@
 
 module Lib  (LRUValue, LRUCache, insertIntoCache, getFromCache) where
 
-import           Control.Lens
+import           Control.Lens    (makeLenses, view, (%~), (&), (+~), (.~))
 import qualified Data.Map        as M (Map, delete, foldlWithKey, insert,
                                        lookup)
 import           Data.Time.Clock (UTCTime (..))
