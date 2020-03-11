@@ -1,7 +1,12 @@
+{-# LANGUAGE NoImplicitPrelude #-}
+
 module Main where
 
-import           Lib (LRUCache, LRUValue, getFromCache, insertIntoCache,
-                      makeSizedLRU)
+import           Lib     (LRUCache, LRUValue, getFromCache, insertIntoCache,
+                          makeSizedLRU)
+import           Prelude (IO, String, print)
 
 main :: IO ()
-main = putStrLn "Do something cute here."
+main = do
+  let myCache = makeSizedLRU 10 :: LRUCache String String
+  print "I have a cache!"
