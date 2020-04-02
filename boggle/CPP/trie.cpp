@@ -1,8 +1,8 @@
 #include "trie.hpp"
 #include <list>
 #include <map>
-#include <string>
 #include <sstream>
+#include <string>
 
 using std::list;
 using std::map;
@@ -28,43 +28,73 @@ using std::stringstream;
   S*
 */
 
+void Trie::addWord(string word) { this->rootNode.addWord(word); }
 
-// dictionary: N entries of 10-character words
+void Node::addWord(string word) {
+  string wordCopy = word;
+  wordCopy.erase(wordCopy.begin());
+  char currentChar = word[0];
 
-void Trie::addWord(string word) {
-  if (word == "") {
-    pathIsWord = true;
+  auto mapIter = this->children.find(currentChar);
+  if (mapIter == this->children.end()) {
+    Node tempNode;
+    if (wordCopy == "") {
+      tempNode.isWord = true;
+    } else {
+      tempNode.addWord(wordCopy);
+    }
+    this->children[currentChar] = tempNode;
     return;
   }
-
-  char word_character = word[0];
-  string tempWord = word;
-  tempWord.erase(tempWord.begin());
-
-  Trie tempNode;
-  if (children.find(word_character) != children.end()) {
-    tempNode = children[word_character];
-  }
-
-  if (tempWord == "") {
-    tempNode.pathIsWord = true;
-  }
-
-  if (tempWord != "") {
-    tempNode.addWord(tempWord);
-  }
-
-  children[word_character] = tempNode;
-  return;
+  mapIter->second.addWord(wordCopy);
 }
 
-string traverseTrie(Trie t) {
+bool Trie::searchPrefix(string prefix) {
+  return this->rootNode.searchPrefix(prefix);
+}
+
+bool Node::searchPrefix(string prefix) {
+  string prefixCopy = prefix;
+  char currentChar = prefix[0];
+  prefixCopy.erase(prefixCopy.begin());
+
+  auto mapIter = this->children.find(currentChar);
+  if (mapIter == this->children.end()) {
+    return false;
+  }
+
+  if (prefixCopy == "") {
+    return true;
+  }
+
+  return mapIter->second.searchPrefix(prefixCopy);
+}
+
+bool Trie::searchWord(string word) { return this->rootNode.searchWord(word); }
+
+bool Node::searchWord(string word) {
+  string wordCopy = word;
+  char currentChar = word[0];
+  wordCopy.erase(wordCopy.begin());
+
+  auto mapIter = this->children.find(currentChar);
+  if (mapIter == this->children.end()) {
+    return false;
+  }
+  if (wordCopy == "") {
+    return this->children[currentChar].isWord;
+  }
+  return this->children[currentChar].searchWord(wordCopy);
+}
+
+string traverseTrieNodes(Node n) {
   string result;
   stringstream ss;
-  for (auto iter = t.children.begin(); iter != t.children.end(); ++iter) {
-    ss << "Node value: '" << iter->first << "' " << iter->second.pathIsWord
-       << "\n";
-    ss << traverseTrie(iter->second);
+  for (auto iter = n.children.begin(); iter != n.children.end(); ++iter) {
+    ss << "Node value: '" << iter->first << "' " << iter->second.isWord << "\n";
+    ss << traverseTrieNodes(iter->second);
   }
   return ss.str();
 }
+
+string traverseTrie(Trie t) { return traverseTrieNodes(t.rootNode); }
