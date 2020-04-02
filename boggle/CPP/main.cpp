@@ -1,16 +1,19 @@
 #include "cxxopts.hpp"
 #include "trie.hpp"
+#include <algorithm>
 #include <iostream>
-#include <list>
+#include <set>
 #include <string>
+#include <vector>
 
 using std::cerr;
 using std::cin;
 using std::cout;
 using std::endl;
-using std::ifstream;
-using std::list;
+using std::max;
+using std::set;
 using std::string;
+using std::vector;
 
 template <typename T> set<T> operator+(const set<T> &a, const set<T> &b) {
   set<T> s = set<T>(a.begin(), a.end());
@@ -27,32 +30,65 @@ template <typename T> set<T> operator+=(set<T> &lVal, const set<T> &&rVal) {
   return lVal;
 }
 
+set<string> search(vector<vector<char>> boggleMatrix,
+                   vector<vector<bool>> visited, Trie t, int i, int j,
+                   string prefix) {
+
+  set<string> result;
+  int boardSize = ((int)boggleMatrix.size());
+  if (t.searchPrefix(prefix) == false) {
+    return result;
+  }
+
+  visited[i][j] = true;
+
+  string word = prefix + boggleMatrix[i][j];
+  if (t.searchWord(word)) {
+    result.insert(word);
+  }
+
+  for (auto i_ = max(0, i - 1); i_ < i + 2; ++i_) {
+    for (auto j_ = max(0, j - 1); j_ < j + 2; ++j_) {
+      if (i_ < boardSize && j_ < boardSize && !visited[i_][j_]) {
+        result += search(boggleMatrix, visited, t, i_, j_, word);
+      }
+    }
+  }
+
+  visited[i][j] = false;
   return result;
 }
 
-list<string> boggleSolver(list<list<char>> boggleMatrix, Trie dictionary) {
-  list<string> result;
+vector<string> boggleSolver(vector<vector<char>> boggleMatrix,
+                            Trie dictionary) {
+  set<string> result;
   auto boardSize = boggleMatrix.size();
-  list<list<bool>> visited(boardSize, list<bool>(boardSize, false));
+  vector<vector<bool>> visited(boardSize, vector<bool>(boardSize, false));
 
-  for (auto iter_i = boggleMatrix.begin(); iter_i != boggleMatrix.end();
-       ++iter_i) {
-    for (auto iter_j = *iter_i->begin(); iter_j != *iter_i->end(); ++iter_j) {
-      ;
-    };
+  for (long unsigned int i = 0; i < boardSize; ++i) {
+    for (long unsigned int j = 0; j < boardSize; ++j) {
+      result += search(boggleMatrix, visited, dictionary, i, j, "");
+    }
   }
-  return result;
+
+  return vector<string>(result.begin(), result.end());
+}
+
+void printSet(set<int> a) {
+  for (auto iter = a.begin(); iter != a.end(); ++iter) {
+    cout << "Value: " << *iter << endl;
+  }
 }
 
 int main() {
-  list<string> dictionary{"APP", "APPLE", "APPLY", "BUS", "BUSINESS"};
+  vector<string> dictionary{"APP", "APPLE", "APPLY", "BUS", "BUSINESS"};
   auto t = Trie::makeTrie(dictionary);
   cout << traverseTrie(t) << endl;
 
   cout << "findPrefix 'APPL': " << t.searchPrefix("APPL") << endl;
   cout << "findPrefix 'BUSIN': " << t.searchPrefix("BUSIN") << endl;
-  cout << "findPrefix 'BUTTTHANDER': " << t.searchPrefix("BUTTTHANDER")
-       << endl; // yes, I've been watching dice, camera, action.
+  // yes, I've been watching dice, camera, action. all praise to lightfall.
+  cout << "findPrefix 'BUTTTHANDER': " << t.searchPrefix("BUTTTHANDER") << endl;
   cout << "findWord 'APP': " << t.searchWord("APP") << endl;
   cout << "findWord 'APPL': " << t.searchWord("APPL") << endl;
   cout << "findWord 'BUSIN': " << t.searchWord("BUSIN") << endl;
@@ -60,10 +96,30 @@ int main() {
 
   cout << traverseTrie(t) << endl;
 
-  list<list<char>> boggleGrid{
+  vector<vector<char>> boggleGrid{
       {'A', 'B', 'C'}, {'S', 'P', 'U'}, {'P', 'S', 'T'}};
 
   auto wordList = boggleSolver(boggleGrid, t);
+
+  set<int> setA{1, 2, 3};
+  set<int> setB{3, 4, 5, 6};
+
+  set<int> setC = setA + setB;
+  printSet(setC);
+
+  cout << "++++" << endl;
+  setA = setA + setB;
+
+  set<int> setD{1, 2, 3};
+  printSet(setA);
+  cout << "++++" << endl;
+  setD += set<int>{10, 11, 12};
+  printSet(setD);
+
+  cout << "Word set list print loop." << endl;
+  for (auto iter = wordList.begin(); iter != wordList.end(); ++iter) {
+    cout << "Word found: " << *iter << endl;
+  }
 
   return 0;
 }
