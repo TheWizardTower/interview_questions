@@ -12,11 +12,20 @@ using std::ifstream;
 using std::list;
 using std::string;
 
-list<string> boggleTraversal(list<list<char>> boggleMatrix,
-                             list<list<char>>::iterator iter_i,
-                             list<char>::iterator iter_j, Trie dictionary,
-                             string partialWord) {
-  list<string> result;
+template <typename T> set<T> operator+(const set<T> &a, const set<T> &b) {
+  set<T> s = set<T>(a.begin(), a.end());
+  for (const auto &element : b) {
+    s.insert(element);
+  }
+  return s;
+}
+
+template <typename T> set<T> operator+=(set<T> &lVal, const set<T> &&rVal) {
+  for (const auto &element : rVal) {
+    lVal.insert(element);
+  }
+  return lVal;
+}
 
   return result;
 }
