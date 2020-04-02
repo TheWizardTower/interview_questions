@@ -3,3 +3,4 @@
 dist-newstyle
 .#*
 /boggle/CPP/boggle
+flycheck*.plist
