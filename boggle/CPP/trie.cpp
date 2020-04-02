@@ -55,7 +55,7 @@ bool Trie::searchPrefix(string prefix) {
 
 bool Node::searchPrefix(string prefix) {
   if (prefix == "") {
-    return false;
+    return true;
   }
   string prefixCopy = prefix;
   char currentChar = prefix[0];
@@ -77,7 +77,7 @@ bool Trie::searchWord(string word) { return this->rootNode.searchWord(word); }
 
 bool Node::searchWord(string word) {
   if (word == "") {
-    return false;
+    return true;
   }
   string wordCopy = word;
   char currentChar = word[0];
