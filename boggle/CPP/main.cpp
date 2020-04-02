@@ -8,28 +8,6 @@ using std::endl;
 using std::list;
 using std::string;
 
-/*
-APPLE
-APP
-APPLY
-BUS
-BUSINESS
-
-<root>
-A   B
-P   U
-P*  S*
-L    \
-| \   I
-E* Y* N
-      E
-      S
-      S*
-
-root
-A P P L E
-*/
-
 int main() {
   list<string> dictionary{"APP", "APPLE", "APPLY", "BUS", "BUSINESS"};
   auto t = makeTrie(dictionary);

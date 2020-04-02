@@ -8,6 +8,27 @@ using std::map;
 using std::string;
 using std::stringstream;
 
+
+/*
+  APPLE
+  APP
+  APPLY
+  BUS
+  BUSINESS
+
+  <root>
+  A   B
+  P   U
+  P*  S*
+  L    \
+  | \   I
+  E* Y* N
+  E
+  S
+  S*
+*/
+
+
 class Trie {
 public:
   void addWord(string word) {
