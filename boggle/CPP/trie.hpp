@@ -1,12 +1,12 @@
 #pragma once
 
-#include <list>
 #include <map>
 #include <string>
+#include <vector>
 
-using std::list;
 using std::map;
 using std::string;
+using std::vector;
 
 class Node {
 public:
@@ -20,14 +20,18 @@ public:
 class Trie {
 public:
   Node rootNode;
-
-  static Trie makeTrie(list<string> dictionary) {
-    auto t = Trie();
-
-    for (auto iter = dictionary.begin(); iter != dictionary.end(); ++iter) {
+  template <typename Iterator>
+  // TODO: make Trie a generic type.
+  //static Trie<decltype(*Iterator)> makeTrie(Iterator begin, Iterator end);
+  static Trie makeTrie(Iterator begin, Iterator end) {
+    Trie t;
+    for (auto iter = begin; iter != end; ++iter) {
       t.addWord(*iter);
     }
     return t;
+  }
+  static Trie makeTrie(vector<string> dictionary) {
+    return makeTrie(dictionary.begin(), dictionary.end());
   }
 
   void addWord(string);
