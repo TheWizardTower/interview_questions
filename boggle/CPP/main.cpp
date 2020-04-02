@@ -33,20 +33,12 @@ list<string> boggleSolver(list<list<char>> boggleMatrix, Trie dictionary) {
 }
 
 int main() {
-  cout << "Hello, world!" << endl;
   list<string> dictionary{"APP", "APPLE", "APPLY", "BUS", "BUSINESS"};
-  cout << "Making Trie." << endl;
-
   auto t = Trie::makeTrie(dictionary);
-
-  cout << "Traversing Trie" << endl;
-
   cout << traverseTrie(t) << endl;
 
   list<list<char>> boggleGrid{
       {'A', 'B', 'C'}, {'S', 'P', 'U'}, {'P', 'S', 'T'}};
-
-  cout << "Calling solver function." << endl;
 
   auto wordList = boggleSolver(boggleGrid, t);
 
