@@ -24,6 +24,4 @@ public:
   map<char, Trie> children;
 };
 
-Trie makeTrie(list<string>);
-
 string traverseTrie(Trie);
