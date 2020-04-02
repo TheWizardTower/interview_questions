@@ -1,3 +1,3 @@
-[submodule "lib/cpp/cxxopts"]
-	path = lib/cpp/cxxopts
+[submodule "lib/CPP/cxxopts"]
+	path = lib/CPP/cxxopts
 	url = git@github.com:jarro2783/cxxopts.git
