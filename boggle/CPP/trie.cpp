@@ -1,3 +1,4 @@
+#include "trie.hpp"
 #include <list>
 #include <map>
 #include <string>
@@ -7,7 +8,6 @@ using std::list;
 using std::map;
 using std::string;
 using std::stringstream;
-
 
 /*
   APPLE
@@ -29,48 +29,33 @@ using std::stringstream;
 */
 
 
-class Trie {
-public:
-  void addWord(string word) {
-    if (word == "") {
-      pathIsWord = true;
-      return;
-    }
+// dictionary: N entries of 10-character words
 
-    char word_character = word[0];
-    string tempWord = word;
-    tempWord.erase(tempWord.begin());
-
-    Trie tempNode;
-    if (children.find(word_character) != children.end()) {
-      tempNode = children[word_character];
-    }
-
-    if (tempWord == "") {
-      tempNode.pathIsWord = true;
-    }
-
-    if (tempWord != "") {
-      tempNode.addWord(tempWord);
-    }
-
-    children[word_character] = tempNode;
+void Trie::addWord(string word) {
+  if (word == "") {
+    pathIsWord = true;
     return;
   }
 
-  bool pathIsWord = false;
-  map<char, Trie> children;
-};
+  char word_character = word[0];
+  string tempWord = word;
+  tempWord.erase(tempWord.begin());
 
-// dictionary: N entries of 10-character words
-Trie makeTrie(list<string> dictionary) {
-  auto t = Trie();
-
-  for (auto iter = dictionary.begin(); iter != dictionary.end(); ++iter) {
-    t.addWord(*iter);
+  Trie tempNode;
+  if (children.find(word_character) != children.end()) {
+    tempNode = children[word_character];
   }
 
-  return t;
+  if (tempWord == "") {
+    tempNode.pathIsWord = true;
+  }
+
+  if (tempWord != "") {
+    tempNode.addWord(tempWord);
+  }
+
+  children[word_character] = tempNode;
+  return;
 }
 
 string traverseTrie(Trie t) {
