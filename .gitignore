@@ -4,3 +4,5 @@ dist-newstyle
 .#*
 /boggle/CPP/boggle
 flycheck*.plist
+node_modules
+/lru_cache/TS/lib/

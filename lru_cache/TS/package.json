@@ -1,0 +1,37 @@
+{
+  "name": "ts",
+  "version": "1.0.0",
+  "description": "LRUCache implementation in TypeScript, using fp-ts and monocle-ts.",
+  "main": "demo.js",
+  "directories": {
+    "lib": "lib"
+  },
+  "scripts": {
+    "test": "node lib/demo.js",
+    "build": "tsc",
+    "format": "prettier --write \"src/*.ts\"",
+    "lint": "tslint -p tsconfig.json",
+    "clean": "rm -rf lib"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/TheWizardTower/interview_questions/tree/master/lru_cache/TS/"
+  },
+  "keywords": [
+    "LRUCache",
+    "typescript",
+    "FP",
+    "interview_questions",
+    "lenses"
+  ],
+  "author": "Adam James McCullough",
+  "license": "GPL-3.0-or-later",
+  "devDependencies": {
+    "fp-ts": "^2.5.3",
+    "monocle-ts": "^2.1.0",
+    "prettier": "^2.0.4",
+    "tslint": "^6.1.1",
+    "tslint-config-prettier": "^1.18.0",
+    "typescript": "^3.8.3"
+  }
+}
