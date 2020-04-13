@@ -1,10 +1,10 @@
-import { Eq } from 'fp-ts/lib/Eq';
-import { Lens } from 'monocle-ts';
-import { Magma } from 'fp-ts/lib/Magma';
-import { Option, none, some } from 'fp-ts/lib/Option';
-import { Ord, ordString } from 'fp-ts/lib/Ord';
 import { array } from 'fp-ts/lib/Array';
-import { toArray, deleteAt, insertAt, fromFoldable, lookup, updateAt } from 'fp-ts/lib/Map';
+import { Eq } from 'fp-ts/lib/Eq';
+import { Magma } from 'fp-ts/lib/Magma';
+import { deleteAt, fromFoldable, insertAt, lookup, toArray, updateAt } from 'fp-ts/lib/Map';
+import { Ord, ordString } from 'fp-ts/lib/Ord';
+import { Option, none, some } from 'fp-ts/lib/Option';
+import { Lens } from 'monocle-ts';
 
 interface LRUValue<V> {
   _accessTime: number;
