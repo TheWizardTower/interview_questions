@@ -6,13 +6,14 @@ module Lib  (LRUValue, LRUCache, insertIntoCache, getFromCache, makeSizedLRU) wh
 import           Control.Lens (makeLenses, view, (%~), (&), (+~), (.~))
 import qualified Data.Map     as M (Map, delete, foldlWithKey, fromList, insert,
                                     lookup)
-import           Prelude      (Int, Maybe (..), Ord (..), Ordering (..), return,
-                               ($), (+))
+import           Prelude      (Eq, Int, Maybe (..), Ord (..), Ordering (..),
+                               Show, return, ($), (+))
 
 data LRUValue v = LRUValue
     { _accessTime :: Int
     , _value      :: v
     }
+    deriving (Eq, Ord, Show)
 
 data LRUCache k v = LRUCache
     { _cache         :: M.Map k (LRUValue v)
@@ -20,6 +21,7 @@ data LRUCache k v = LRUCache
     , _currentLength :: Int
     , _maxReadTime   :: Int
     }
+    deriving (Eq, Ord, Show)
 
 makeLenses ''LRUValue
 makeLenses ''LRUCache
@@ -42,9 +44,9 @@ mapWithKeyFunc pair kr vr =
                          accessTimeR = view accessTime vr
                          cmpResult = compare accessTimeL accessTimeR in
                      case cmpResult of
-                           LT -> return (kr, vr)
+                           LT -> return (kl, vl)
                            EQ -> return (kr, vr)
-                           GT -> return (kl, vl)
+                           GT -> return (kr, vr)
 
 removeOldestKey :: (Ord k) => M.Map k (LRUValue v) -> M.Map k (LRUValue v)
 removeOldestKey oldMap = let oldestMaybeKVPair = M.foldlWithKey mapWithKeyFunc Nothing oldMap in
@@ -56,14 +58,21 @@ insertIntoCache :: (Ord k) => LRUCache k v -> k -> v -> LRUCache k v
 insertIntoCache inputCache key inValue =
   let currCap = view capacity inputCache
       currLen = view currentLength inputCache
-      insertTime = view maxReadTime inputCache in
-      if currCap >= currLen then
-        inputCache & currentLength +~ 1
-        & cache %~ M.insert key (LRUValue { _value = inValue, _accessTime = insertTime + 1})
-      else
-        inputCache & cache %~ removeOldestKey
-                   & cache %~ M.insert key (LRUValue { _value = inValue, _accessTime = insertTime + 1 })
-                   & maxReadTime +~ 1
+      insertTime = view maxReadTime inputCache
+      newVal     = LRUValue { _value = inValue, _accessTime = insertTime + 1}
+      mapMaybe   = M.lookup key $ view cache inputCache in
+      case mapMaybe of
+        Just _ -> inputCache & maxReadTime %~ (+1)
+                             & cache %~ M.delete key
+                             & cache %~ M.insert key newVal
+        Nothing -> do
+          if currLen + 1 <= currCap then
+            inputCache & currentLength +~ 1
+                       & maxReadTime +~ 1
+                       & cache %~ M.insert key newVal
+          else inputCache & maxReadTime +~ 1
+                          & cache %~ removeOldestKey
+                          & cache %~ M.insert key newVal
 
 updateTimestamp :: Ord k => LRUCache k v -> k -> LRUCache k v
 updateTimestamp inputCache key =
