@@ -1,7 +1,7 @@
 import { array } from 'fp-ts/lib/Array';
 import { Eq } from 'fp-ts/lib/Eq';
 import { Magma } from 'fp-ts/lib/Magma';
-import { deleteAt, fromFoldable, insertAt, lookup, toArray, updateAt } from 'fp-ts/lib/Map';
+import { deleteAt, fromFoldable, insertAt, lookup, toArray } from 'fp-ts/lib/Map';
 import { Ord, ordString } from 'fp-ts/lib/Ord';
 import { Option, none, some } from 'fp-ts/lib/Option';
 import { Lens } from 'monocle-ts';
@@ -131,18 +131,21 @@ export function insertIntoCache<K>(O: Ord<K>): <V>(key: K, value: V, inputCache:
 
 export function updateTimestamp<K>(O: Eq<K>): <V>(key: K, inputCache: LRUCache<K, V>) => LRUCache<K, V> {
   const mapLookup = lookup(O);
-  const mapSet = updateAt(O);
+  const mapDel = deleteAt(O);
+  const mapIns = insertAt(O);
   return (key, inputCache) => {
     const mapMaybe = mapLookup(key, inputCache._cache);
     if (mapMaybe._tag === 'None') {
       return inputCache;
     }
-    const val = mapMaybe.value;
-    const newCache = inputCache;
-    newCache._maxReadTime++;
-    val._accessTime = newCache._maxReadTime;
-    mapSet(key, val)(newCache._cache);
-    return newCache;
+    const insertTime = maxReadTime.get(inputCache);
+    const readTimeLens = maxReadTime.set(insertTime + 1);
+    const accessTimeLens = accessTime.set(insertTime + 1);
+    let resultCache = readTimeLens(inputCache);
+    const val = accessTimeLens(mapMaybe.value);
+    resultCache = cache.modify(mapDel(key))(resultCache);
+    resultCache = cache.modify(mapIns(key, val))(resultCache);
+    return resultCache;
   };
 }
 
