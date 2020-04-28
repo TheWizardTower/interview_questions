@@ -37,16 +37,15 @@ makeSizedLRU :: (Ord k) => Int -> LRUCache k v
 makeSizedLRU size = emptyLRU & capacity .~ size
 
 mapWithKeyFunc :: Maybe (k, LRUValue v) -> k -> LRUValue v -> Maybe (k, LRUValue v)
-mapWithKeyFunc pair kr vr =
-  case pair of
-    Nothing -> Just (kr, vr)
-    Just (kl, vl) -> let accessTimeL = view accessTime vl
-                         accessTimeR = view accessTime vr
-                         cmpResult = compare accessTimeL accessTimeR in
-                     case cmpResult of
-                           LT -> return (kl, vl)
-                           EQ -> return (kr, vr)
-                           GT -> return (kr, vr)
+mapWithKeyFunc Nothing kr vr = Just (kr, vr)
+mapWithKeyFunc (Just (kl, vl)) kr vr =
+    let accessTimeL = view accessTime vl
+        accessTimeR = view accessTime vr
+        cmpResult = compare accessTimeL accessTimeR in
+      case cmpResult of
+        LT -> return (kl, vl)
+        EQ -> return (kr, vr)
+        GT -> return (kr, vr)
 
 removeOldestKey :: (Ord k) => M.Map k (LRUValue v) -> M.Map k (LRUValue v)
 removeOldestKey oldMap = let oldestMaybeKVPair = M.foldlWithKey mapWithKeyFunc Nothing oldMap in
