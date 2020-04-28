@@ -4,7 +4,7 @@ github:              "TheWizardTower/interview_questions/concordance/haskell"
 license:             BSD3
 author:              "Adam McCullough"
 maintainer:          "merlinfmct87@gmail.com"
-copyright:           "(c) 2018 Adam McCullough"
+copyright:           "(c) 2020 Adam McCullough"
 
 extra-source-files:
 - README.md
