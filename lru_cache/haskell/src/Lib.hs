@@ -48,10 +48,11 @@ mapWithKeyFunc (Just (kl, vl)) kr vr =
         GT -> return (kr, vr)
 
 removeOldestKey :: (Ord k) => M.Map k (LRUValue v) -> M.Map k (LRUValue v)
-removeOldestKey oldMap = let oldestMaybeKVPair = M.foldlWithKey mapWithKeyFunc Nothing oldMap in
-                           case oldestMaybeKVPair of
-                             Nothing       -> oldMap
-                             Just (key, _) -> M.delete key oldMap
+removeOldestKey oldMap =
+  let oldestMaybeKVPair = M.foldlWithKey mapWithKeyFunc Nothing oldMap in
+    case oldestMaybeKVPair of
+      Nothing       -> oldMap
+      Just (key, _) -> M.delete key oldMap
 
 insertIntoCache :: (Ord k) => LRUCache k v -> k -> v -> LRUCache k v
 insertIntoCache inputCache key inValue =
