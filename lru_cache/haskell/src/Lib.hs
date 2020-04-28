@@ -65,7 +65,7 @@ insertIntoCache inputCache key inValue =
         Just _ -> inputCache & maxReadTime %~ (+1)
                              & cache %~ M.delete key
                              & cache %~ M.insert key newVal
-        Nothing -> do
+        Nothing ->
           if currLen + 1 <= currCap then
             inputCache & currentLength +~ 1
                        & maxReadTime +~ 1
