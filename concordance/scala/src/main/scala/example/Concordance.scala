@@ -26,8 +26,8 @@ object Concordance extends CommandIOApp(
   }
 
   @SuppressWarnings(Array("org.wartremover.warts.Any"))
-  val bytesToTrimmedWords: Pipe[IO, Byte, String] = { in =>
-    in
+  val bytesToTrimmedWords: Pipe[IO, Byte, String] = {
+    _
       .through(text.utf8Decode)
       .map(s => s.map(c => if(Character.isWhitespace(c)) '\n' else c))
       .through(text.lines)
@@ -36,8 +36,8 @@ object Concordance extends CommandIOApp(
   }
 
   @SuppressWarnings(Array("org.wartremover.warts.Any"))
-  val toSortedResult: Pipe[IO, Map[String, Int], Vector[(Int, Set[String])]] = { in =>
-    in
+  val toSortedResult: Pipe[IO, Map[String, Int], Vector[(Int, Set[String])]] = {
+    _
       .map{
         (f: Map[String, Int]) => f.foldRight(Map.empty[Int, Set[String]]){
           case ((word: String, count: Int), acc: Map[Int, Set[String]]) => acc |+| Map(count->Set(word))
@@ -45,6 +45,15 @@ object Concordance extends CommandIOApp(
       .toVector
       .sortWith(_._1 > _._1) // high to low
       }
+  }
+
+  @SuppressWarnings(Array("org.wartremover.warts.Any"))
+  def businessLogic(count: Int): Pipe[IO, Byte, Vector[(Int, Set[String])]] = {
+    _
+      .through(bytesToTrimmedWords)
+      .foldMap{ word: String => Map(word->1)}
+      .through(toSortedResult)
+      .map{_.take(count)}
   }
 
   @SuppressWarnings(Array("org.wartremover.warts.Any"))
@@ -57,11 +66,8 @@ object Concordance extends CommandIOApp(
        blocker <- Stream.resource(Blocker[IO])
        bufferSize = 4096
        _ <- filename.fold(io.stdin[IO](bufferSize, blocker)){path =>  io.file.readAll[IO](path, blocker, bufferSize) }
-       .through(bytesToTrimmedWords)
-       .foldMap{ word: String => Map(word->1)}
-       .through(toSortedResult)
-       .map{_.take(count)}
-       .through(io.stdoutLines(blocker))
+         .through(businessLogic(count))
+         .through(io.stdoutLines(blocker))
       } yield ()
       stream
         .compile.drain.as(ExitCode.Success)
