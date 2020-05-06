@@ -18,13 +18,6 @@ interface LRUCache<K, V> {
   _maxReadTime: number;
 }
 
-const emptyVal: LRUCache<any, any> = {
-  _capacity: 0,
-  _maxReadTime: 0,
-  _currentLength: 0,
-  _cache: new Map<any, LRUValue<any>>(),
-};
-
 // TODO: Make this more typesafe.
 // const capacity:<k,v>(cache: LRUCache<k,v>) => Lens<LRUCache<any, any>, number> = Lens.fromProp<LRUCache<any, any>>()('_capacity');
 export const capacity = Lens.fromProp<LRUCache<any, any>>()('_capacity');
@@ -34,9 +27,19 @@ export const cache = Lens.fromProp<LRUCache<any, any>>()('_cache');
 export const accessTime = Lens.fromProp<LRUValue<any>>()('_accessTime');
 export const value = Lens.fromProp<LRUValue<any>>()('_value');
 
+function emptyValue<K, V>(): LRUCache<K, V> {
+    const emptyVal: LRUCache<any, any> = {
+        _capacity: 0,
+        _maxReadTime: 0,
+        _currentLength: 0,
+        _cache: new Map<any, LRUValue<any>>(),
+    };
+    return emptyVal;
+}
+
 export function makeSizedLRU<K, V>(size: number): LRUCache<K, V> {
   const myLens = capacity.set(size);
-  return myLens(emptyVal);
+  return myLens(emptyValue());
 }
 
 export function mapWithKeyFunc<K, V>(
