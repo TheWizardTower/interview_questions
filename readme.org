@@ -1,0 +1,43 @@
+ ___       _                  _
+|_ _|_ __ | |_ ___ _ ____   _(_) _____      __
+ | || '_ \| __/ _ \ '__\ \ / / |/ _ \ \ /\ / /
+ | || | | | ||  __/ |   \ V /| |  __/\ V  V /
+|___|_| |_|\__\___|_|    \_/ |_|\___| \_/\_/
+
+  ___                  _   _
+ / _ \ _   _  ___  ___| |_(_) ___  _ __  ___
+| | | | | | |/ _ \/ __| __| |/ _ \| '_ \/ __|
+| |_| | |_| |  __/\__ \ |_| | (_) | | | \__ \
+ \__\_\\__,_|\___||___/\__|_|\___/|_| |_|___/
+
+
+* Purpose
+There are three. First, give me a framework to structure my self-study. I'm a compulsive autodidact and reflexively curious, and I love to explore how different programming languages structure problems and influence how engineers think about solutions.
+
+Second, as an example of take-home project assignments I've gotten. I tend to dislike the "code puzzle in an hour" style of interviews. Reversing a binary tree on a whiteboard doesn't line up with the usual developer workflow of learning a language, libraries, and idioms, or becoming effective with a legacy API.
+
+That's not to say that I dislike thinking about code puzzles as a way to grow or learn. Merely that asking these sorts of questions with a 30 minute timer attached is an exceptionally error-prone way of getting signal about a candidate.
+
+Third, this is a convenient place to show solutions to friends and mentors, as either examples for them to learn from, or raw material for them to critique and offer feedback on.
+
+* Questions
+** Build a concordance
+Write a program that takes in input, either from a specified file, or stdin, and a number N. Print the N most-frequently-used words in the input.
+** Build a simple least-recently-used cache.
+Build a data structure that emulates an LRU cache, such as Memcache. This should have insert, read, and delete methods. Do not try to reason about actual memory usage in bytes, simply count the key/value pairs you've stored. If the cache is "full" and receives an insert request, evict the least-recently-used value from the cache to make room.
+** Boggle
+Write a program that takes in an NxN Boggle game board, and produces a list of words that can be legally formed from the supplied game board.
+** Integration
+Given an algebraic function, write a function that calculates the area under the curve of said function between the upper and lower bounds, and the volume of the object rotated around the Y-axis between the same upper and lower bounds.
+
+* Feedback?
+Did something impress or horrify you? Do you have questions about something I've done? Did you find a bug, or do you have a fun problem to add to the list?
+
+I'm always happy to hear feedback or answer questions. I've spent a lot of time struggling to figure out things that were needlessly over-complicated by engineers that valued sounding important and intelligent rather than supplying effective explanations.
+
+Feel free to file an issue or a pull request on this repo, or reach out to me directly:
+
+https://www.linkedin.com/in/adammccullough/
+https://thewizardtower.github.io/
+
+I'm also actively looking for new job opportunities as a remote software engineer, so feel free to reach out if you like what you see. :)
