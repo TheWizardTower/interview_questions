@@ -6,3 +6,6 @@ dist-newstyle
 flycheck*.plist
 node_modules
 /lru_cache/TS/lib/
+.metals
+/concordance/rust/target/
+/.ccls-cache/
