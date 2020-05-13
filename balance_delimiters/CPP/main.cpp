@@ -2,15 +2,12 @@
 #include <map>
 #include <stack>
 #include <vector>
-// str input -> returns true if balanced '()' '('
-// { []}()
-// "("
 
-using std::string;
-using std::stack;
 using std::cout;
 using std::endl;
 using std::map;
+using std::stack;
+using std::string;
 using std::vector;
 
 bool isBalanced(string input) {
@@ -20,45 +17,47 @@ bool isBalanced(string input) {
   openDelim[']'] = '[';
   openDelim['}'] = '{';
 
-  for (auto const& character : input) {
-    switch(character) {
-      case '\'':
-        if (delimiters.size() != 0 && delimiters.top() == '\'') {
-          delimiters.pop();
-          continue;
-        }
-        if (delimiters.size() != 0 && delimiters.top() != '\'') {
-          delimiters.push(character);
-          continue;
-        }
-      case '"':
-        if (delimiters.size() != 0 && delimiters.top() == '"') {
-          delimiters.pop();
-          continue;
-        }
-        if (delimiters.size() != 0 && delimiters.top() != '"') {
-          delimiters.push(character);
-          continue;
-        }
-      case '(':
-      case '[':
-      case '{':
-        if (delimiters.size() != 0 && (delimiters.top() == '\'' || delimiters.top() == '"')) {
-          continue;
-        }
+  for (auto const &character : input) {
+    switch (character) {
+    case '\'':
+      if (delimiters.size() != 0 && delimiters.top() == '\'') {
+        delimiters.pop();
+        continue;
+      }
+      if (delimiters.size() != 0 && delimiters.top() != '\'') {
         delimiters.push(character);
+        continue;
+      }
+    case '"':
+      if (delimiters.size() != 0 && delimiters.top() == '"') {
+        delimiters.pop();
+        continue;
+      }
+      if (delimiters.size() != 0 && delimiters.top() != '"') {
+        delimiters.push(character);
+        continue;
+      }
+    case '(':
+    case '[':
+    case '{':
+      if (delimiters.size() != 0 &&
+          (delimiters.top() == '\'' || delimiters.top() == '"')) {
+        continue;
+      }
+      delimiters.push(character);
+      break;
+    case ')':
+    case ']':
+    case '}':
+      if (delimiters.size() != 0 &&
+          (delimiters.top() == '\'' || delimiters.top() == '"')) {
+        continue;
+      }
+      if (delimiters.size() != 0 && delimiters.top() == openDelim[character]) {
+        delimiters.pop();
         break;
-      case ')':
-      case ']':
-      case '}':
-        if (delimiters.size() != 0 && (delimiters.top() == '\'' || delimiters.top() == '"')) {
-          continue;
-        }
-        if (delimiters.size() != 0 && delimiters.top() == openDelim[character]) {
-          delimiters.pop();
-          break;
-        }
-        return false;
+      }
+      return false;
     }
   }
 
@@ -71,10 +70,18 @@ bool isBalanced(string input) {
 
 int main() {
   cout << "Hello World!\n";
-  vector<string> tests = {"()", "", "(", ")", "([{}])", "()[}", "c++ is good []{(()}", "\"(\"", "(\")))\")", "'((('()"};
+  vector<string> tests = {"()",
+                          "",
+                          "(",
+                          ")",
+                          "([{}])",
+                          "()[}",
+                          "c++ is good []{(()}",
+                          "\"(\"",
+                          "(\")))\")",
+                          "'((('()"};
 
-  for (const auto& test: tests) {
-      cout << "Testing '" << test << "' " << isBalanced(test) << endl;
+  for (const auto &test : tests) {
+    cout << "Testing '" << test << "' " << isBalanced(test) << endl;
   }
-
 }
