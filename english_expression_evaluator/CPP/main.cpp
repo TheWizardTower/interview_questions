@@ -24,7 +24,6 @@ eval_("two times three plus four plus five plus six times seven") == 57
 */
 #include <iostream>
 #include <sstream>
-#include <jsoncpp/json/json.h>
 #include <assert.h>
 #include <vector>
 #include <iterator>
