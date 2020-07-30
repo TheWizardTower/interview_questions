@@ -28,13 +28,16 @@ eval_("two times three plus four plus five plus six times seven") == 57
 #include <vector>
 #include <iterator>
 #include <variant>
+#include <string>
 
 using std::cout;
 using std::endl;
 using std::get_if;
 using std::istream_iterator;
 using std::istringstream;
+using std::ostream;
 using std::string;
+using std::to_string;
 using std::variant;
 using std::vector;
 
@@ -45,12 +48,41 @@ enum class Operation
   Plus
 };
 
-struct MyExpressionTree
+string showASTValue(const variant<int, Operation> &val)
 {
-  Operation operation;
-  variant<int, MyExpressionTree *> LeftOperand;
-  variant<int, MyExpressionTree *> RightOperand;
-};
+  string result;
+  auto oper = get_if<Operation>(&val);
+  if (oper != NULL)
+  {
+    if (*oper == Operation::Negative)
+    {
+      result = "Negative operation.";
+    }
+    else if (*oper == Operation::Times)
+    {
+      result = "Times operation.";
+    }
+    else if (*oper == Operation::Plus)
+    {
+      result = "Plus operation.";
+    }
+  }
+  auto literal = get_if<int>(&val);
+  if (literal != NULL)
+  {
+    result = "Number: " + to_string(*literal);
+  }
+
+  return result;
+}
+
+// Operator definition for the value of our AST vector, referencing the above case/switch
+// function.
+ostream &operator<<(ostream &os, const variant<int, Operation> &var)
+{
+  os << showASTValue(var);
+  return os;
+}
 
 int eval_(string expression)
 {
@@ -120,64 +152,156 @@ int eval_(string expression)
     }
   }
 
+  cout << "Examining AST post tokenization." << endl;
+
   for (const auto node : ast)
   {
-    auto oper = get_if<Operation>(&node);
-    if (oper != NULL)
-    {
-      if (*oper == Operation::Negative)
-      {
-        cout << "Negative operation." << endl;
-      }
-      else if (*oper == Operation::Times)
-      {
-        cout << "Times operation." << endl;
-      }
-      else if (*oper == Operation::Plus)
-      {
-        cout << "Plus operation." << endl;
-      }
-    }
-    auto literal = get_if<int>(&node);
-    if (literal != NULL)
-    {
-      cout << "Number: " << *literal << endl;
-    }
+    cout << node << endl;
   }
 
-  vector<variant<int, Operation>> astPassOne;
-
-  for (int i = 0; i < ast.size(); ++i)
+  // Evaluate negative operator.
+  for (auto iter = ast.begin(); iter != ast.end(); ++iter)
   {
-    auto oper = get_if<Operation>(&ast[i]);
-    if (oper != NULL)
+    auto oper = get_if<Operation>(&(*iter));
+    if (oper == NULL)
     {
-      if (*oper == Operation::Negative)
+      cout << "\tNegative operation, came across non-operator value." << endl;
+      continue;
+    }
+    if (*oper != Operation::Negative)
+    {
+      cout << "\tNegative operation, came across non-negation operator." << endl;
+      continue;
+    }
+    cout << "Negative operation." << endl;
+    if (iter == ast.end())
+    {
+      cout << "Missing operand." << endl;
+      break;
+    }
+    else
+    {
+      auto literal = get_if<int>(&(*(iter + 1)));
+      if (literal == NULL)
       {
-        cout << "Negative operation." << endl;
-        if (i + 1 < ast.size())
-        {
-          cout << "Missing operand." << endl;
-          break;
-        }
-        else
-        {
-          auto literal = get_if<int>(&ast[i + 1]);
-          if (literal == NULL)
-          {
-            cout << "Invalid expression" << endl;
-            break;
-          }
-          astPassOne.push_back(-1 * *literal);
-          ++i;
-          break;
-        }
+        cout << "Invalid expression" << endl;
+        return -1;
       }
-      astPassOne.push_back(ast[i]);
+      auto result = (-1) * (*literal);
+      cout << "Negation result: " << result << endl;
+      iter = ast.erase(iter, iter + 2);
+      iter = ast.emplace(iter, result);
     }
   }
-  return 0;
+
+  cout << "Out of negation evaluotian loop. Examining AST." << endl;
+  for (const auto node : ast)
+  {
+    cout << "\t" << node << endl;
+  }
+
+  // Evaluate multiply
+  for (auto iter = ast.begin(); iter != ast.end(); ++iter)
+  {
+    auto oper = get_if<Operation>(&(*(iter)));
+    if (oper == NULL)
+    {
+      cout << "\tMultiply loop, found non-operator value, continuing over." << endl;
+      continue;
+    }
+    if (*oper != Operation::Times)
+    {
+      cout << "\tMultiply loop, found non-times operator value, continuing over." << endl;
+      continue;
+    }
+    if (iter == ast.begin())
+    {
+      cout << "Missing left operand on multiply operation." << endl;
+    }
+    auto leftOperand = get_if<int>(&(*(iter - 1)));
+    if (leftOperand == NULL)
+    {
+      cout << "Invalid syntax on multiply operation." << endl;
+    }
+    if (iter == ast.end())
+    {
+      cout << "Missing right operand on multiply operation." << endl;
+    }
+    auto rightOperand = get_if<int>(&(*(iter + 1)));
+    if (rightOperand == NULL)
+    {
+      cout << "Invalid syntax on multiply operation." << endl;
+    }
+    cout << "  Left operand: " << *leftOperand << endl;
+    cout << "  Right operand: " << *rightOperand << endl;
+    auto result = (*leftOperand) * (*rightOperand);
+    cout << "Result: " << result << endl;
+    iter = ast.erase(iter - 1, iter + 2);
+    iter = ast.emplace(iter, result);
+  }
+
+  // Evaluate addition
+  for (auto iter = ast.begin(); iter != ast.end(); ++iter)
+  {
+    cout << "  Entering addition loop." << endl;
+    auto oper = get_if<Operation>(&(*(iter)));
+    if (oper == NULL)
+    {
+      cout << "  Found a non-operator value, passing over." << endl;
+      continue;
+    }
+    if (*oper != Operation::Plus)
+    {
+      cout << "  Not a plus operator." << endl;
+      continue;
+    }
+    cout << "  Okay, found plus.";
+    cout << "  Past gates." << endl;
+    if (iter == ast.begin())
+    {
+      cout << "  Missing left operand on addition operation." << endl;
+    }
+    cout << "  Getting left operand." << endl;
+    auto leftOperand = get_if<int>(&(*(iter - 1)));
+    cout << "  Left operand gotten." << endl;
+    if (leftOperand == NULL)
+    {
+      cout << "  Inavalid syntax on addition operation." << endl;
+    }
+
+    if (iter == ast.end())
+    {
+      cout << "  Missing right operand on addition operation." << endl;
+    }
+    cout << "  Getting right operand." << endl;
+    auto rightOperand = get_if<int>(&(*(iter + 1)));
+    cout << "  Right operand gotten." << endl;
+    if (rightOperand == NULL)
+    {
+      cout << "  Inavalid syntax on addition operation." << endl;
+    }
+    cout << "  Left operand: " << *leftOperand << endl;
+    cout << "  Right operand: " << *rightOperand << endl;
+    auto result = *leftOperand + *rightOperand;
+    cout << "Result: " << result << endl;
+    iter = ast.erase(iter - 1, iter + 2);
+    iter = ast.emplace(iter, result);
+  }
+
+  if (ast.size() != 1)
+  {
+    cout << "Something very unfortunate happened, the size isn't one." << endl;
+  }
+  auto finalResult = get_if<int>(&ast.at(0));
+  if (finalResult == NULL)
+  {
+    cout << "Final result was not a number!";
+  }
+  cout << "About to return" << endl;
+  cout << "Result: " << *finalResult << endl;
+  return *finalResult;
 }
+
 int main()
 {
   std::cout << "Hello world" << std::endl;
