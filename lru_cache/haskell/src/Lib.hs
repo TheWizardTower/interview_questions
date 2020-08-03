@@ -1,7 +1,7 @@
 {-# LANGUAGE NoImplicitPrelude #-}
 {-# LANGUAGE TemplateHaskell   #-}
 
-module Lib  (LRUValue, LRUCache, insertIntoCache, getFromCache, makeSizedLRU) where
+module Lib  (LRUValue (..), LRUCache(..), insertIntoCache, getFromCache, makeSizedLRU) where
 
 import           Control.Lens (makeLenses, view, (%~), (&), (+~), (.~))
 import qualified Data.Map     as M (Map, delete, foldlWithKey, fromList, insert,
