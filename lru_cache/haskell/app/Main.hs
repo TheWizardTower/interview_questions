@@ -3,8 +3,7 @@
 module Main where
 
 import           Data.Foldable (foldl')
-import           Lib           (LRUCache, LRUValue, getFromCache,
-                                insertIntoCache, makeSizedLRU)
+import           Lib           (LRUCache, insertIntoCache, makeSizedLRU)
 import           Prelude       (IO, String, print)
 
 main :: IO ()
